@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<title>WebAR Kearifan Lokal</title>
+
+<style>
+body{
+margin:0;
+font-family:Segoe UI;
+background:linear-gradient(135deg,#0099cc,#66ccff);
+color:white;
+text-align:center;
+}
+
+header{padding:25px;background:rgba(0,0,0,0.25);}
+main{padding:20px}
+
+.desa{
+background:rgba(255,255,255,0.1);
+border-radius:12px;
+padding:20px;
+margin:20px auto;
+max-width:500px;
+}
+
+button{
+padding:12px;
+border:none;
+border-radius:8px;
+margin:5px;
+font-weight:bold;
+cursor:pointer;
+}
+
+.marker{background:#ff9800;color:white}
+.markerless{background:#4caf50;color:white}
+
+</style>
+</head>
+
+<body>
+
+<header>
+<h1>WebAR Kearifan Lokal</h1>
+<p>Eksplorasi Rumah Adat dan Ritual Budaya</p>
+</header>
+
+<main>
+
+<div class="desa">
+<h2>Desa Sebujit</h2>
+
+<button class="marker"
+onclick="trackEvent('select_content','sebujit','rumah');location.href='marker.html?desa=sebujit&type=rumah'">
+Marker Rumah
+</button>
+
+<button class="marker"
+onclick="trackEvent('select_content','sebujit','ritual');location.href='marker.html?desa=sebujit&type=ritual'">
+Marker Nyobeng
+</button>
+
+<button class="markerless"
+onclick="trackEvent('select_content','sebujit','rumah');location.href='markerless.html?desa=sebujit&type=rumah'">
+Markerless Rumah
+</button>
+
+<button class="markerless"
+onclick="trackEvent('select_content','sebujit','ritual');location.href='markerless.html?desa=sebujit&type=ritual'">
+Markerless Nyobeng
+</button>
+
+</div>
+
+
+<div class="desa">
+<h2>Desa Jagoi Babang</h2>
+
+<button class="marker"
+onclick="trackEvent('select_content','jagoi','rumah');location.href='marker.html?desa=jagoi&type=rumah'">
+Marker Rumah
+</button>
+
+<button class="marker"
+onclick="trackEvent('select_content','jagoi','ritual');location.href='marker.html?desa=jagoi&type=ritual'">
+Marker Gawia
+</button>
+
+<button class="markerless"
+onclick="trackEvent('select_content','jagoi','rumah');location.href='markerless.html?desa=jagoi&type=rumah'">
+Markerless Rumah
+</button>
+
+<button class="markerless"
+onclick="trackEvent('select_content','jagoi','ritual');location.href='markerless.html?desa=jagoi&type=ritual'">
+Markerless Gawia
+</button>
+
+</div>
+
+</main>
+
+<script>
+
+const API_URL="PASTE_URL_GOOGLE_APPS_SCRIPT";
+
+let startSession=Date.now();
+
+function trackEvent(eventName,desa,objek){
+
+fetch(API_URL,{
+method:"POST",
+body:JSON.stringify({
+timestamp:new Date().toISOString(),
+event:eventName,
+desa:desa,
+object:objek,
+device:navigator.userAgent
+})
+});
+
+}
+
+window.addEventListener("beforeunload",function(){
+
+let duration=Math.floor((Date.now()-startSession)/1000);
+
+fetch(API_URL,{
+method:"POST",
+body:JSON.stringify({
+event:"session_duration",
+duration:duration
+})
+});
+
+});
+
+</script>
+
+</body>
+</html>
