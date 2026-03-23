@@ -1,49 +1,6 @@
-<!DOCTYPE html>
-<html>
-<head>
-
-<meta charset="UTF-8">
-<title>WebAR Markerless</title>
-
-<script src="https://aframe.io/releases/1.4.0/aframe.min.js"></script>
-
-<style>
-body{margin:0;overflow:hidden}
-#ui{position:fixed;bottom:20px;left:50%;transform:translateX(-50%)}
-button{padding:10px;background:#4caf50;color:white;border:none;border-radius:6px}
-</style>
-
-</head>
-
-<body>
-
-<a-scene>
-
-<a-assets>
-
-<a-asset-item id="rumah-sebujit" src="assets/rumah_sebujit.glb"></a-asset-item>
-<a-asset-item id="nyobeng-sebujit" src="assets/nyobeng_sebujit.glb"></a-asset-item>
-
-<audio id="narasi-sebujit-rumah" src="assets/narasi_rumah_sebujit.mp3"></audio>
-<audio id="narasi-sebujit-ritual" src="assets/narasi_nyobeng.mp3"></audio>
-
-<audio id="musik-dayak" src="assets/dayak.mp3"></audio>
-
-</a-assets>
-
-<a-entity id="model-container" position="0 0 -3"></a-entity>
-
-<a-camera position="0 1.6 0"></a-camera>
-
-</a-scene>
-
-<div id="ui">
-<button onclick="location.href='index.html'">Kembali</button>
-</div>
-
 <script>
 
-const API_URL="PASTE_URL_GOOGLE_APPS_SCRIPT";
+const API_URL="https://script.google.com/macros/s/AKfycbxIFfbwSdWVN241UJyyJ8ndkZUzTSgVs5C78DPZLh5EQJbd6sEjMiTlIvHJesuALn2F/exec";
 
 const params=new URLSearchParams(window.location.search);
 const desa=params.get("desa");
@@ -56,26 +13,27 @@ function trackEvent(eventName,desa,objek){
 
 fetch(API_URL,{
 method:"POST",
+mode:"no-cors",
+headers:{
+"Content-Type":"application/json"
+},
 body:JSON.stringify({
 timestamp:new Date().toISOString(),
 event:eventName,
 desa:desa,
-object:objek
+object:objek,
+device:navigator.userAgent
 })
 });
 
 }
 
 if(type==="rumah"){
-
 container.setAttribute("gltf-model","#rumah-sebujit");
-
 }
 
 if(type==="ritual"){
-
 container.setAttribute("gltf-model","#nyobeng-sebujit");
-
 }
 
 trackEvent("model_loaded",desa,type);
@@ -83,6 +41,3 @@ trackEvent("model_loaded",desa,type);
 musik.play();
 
 </script>
-
-</body>
-</html>
