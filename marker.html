@@ -72,9 +72,7 @@ function trackEvent(eventName, desa, object, duration = 0) {
     const desa = params.get("desa");
     const type = params.get("type");
 	
-	if (desa && type) {
-  trackEvent("masuk_marker", desa, type);
-}
+	trackEvent("masuk_marker", desa, type);
 	
     const musikDayak = document.getElementById("musik-dayak");
     const marker = document.getElementById("marker");
