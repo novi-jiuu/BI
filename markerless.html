@@ -4,18 +4,6 @@
   <meta charset="UTF-8" />
   <title>WebAR Markerless</title>
   <script src="https://aframe.io/releases/1.4.0/aframe.min.js"></script>
-  <style>
-    body { margin: 0; overflow: hidden; }
-    #ui {
-      position: fixed; bottom: 20px; left: 50%;
-      transform: translateX(-50%);
-    }
-    button {
-      padding: 10px 15px; border: none;
-      border-radius: 6px; background: #4caf50;
-      color: white; font-weight: bold; cursor: pointer;
-    }
-  </style>
   <script>
 const API_URL = "https://script.google.com/macros/s/AKfycbz5UUBghTmuQB57nuixPhfR39pQVEGjvZzPjsij4lBKzZpswP3bRU-cN8_p82EDneim/exec";
 
@@ -38,6 +26,18 @@ function trackEvent(eventName, desa, object, duration = 0) {
   .catch(err => console.error("Error:", err));
 }
 </script>
+  <style>
+    body { margin: 0; overflow: hidden; }
+    #ui {
+      position: fixed; bottom: 20px; left: 50%;
+      transform: translateX(-50%);
+    }
+    button {
+      padding: 10px 15px; border: none;
+      border-radius: 6px; background: #4caf50;
+      color: white; font-weight: bold; cursor: pointer;
+    }
+  </style>
 </head>
 <body>
   <a-scene>
@@ -73,7 +73,9 @@ function trackEvent(eventName, desa, object, duration = 0) {
     const desa = params.get("desa");
     const type = params.get("type");
 	
-	trackEvent("masuk_markerless", desa, type);
+	if (desa && type) {
+  trackEvent("masuk_markerless", desa, type);
+}
 	
     const container = document.getElementById("model-container");
     const musikDayak = document.getElementById("musik-dayak");
