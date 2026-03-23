@@ -1,43 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>WebAR Markerless</title>
+  <script src="https://aframe.io/releases/1.4.0/aframe.min.js"></script>
+  <style>
+    body { margin: 0; overflow: hidden; }
+    #ui {
+      position: fixed; bottom: 20px; left: 50%;
+      transform: translateX(-50%);
+    }
+    button {
+      padding: 10px 15px; border: none;
+      border-radius: 6px; background: #4caf50;
+      color: white; font-weight: bold; cursor: pointer;
+    }
+  </style>
+</head>
 <script>
+const API_URL = "https://script.google.com/macros/s/AKfycbz5UUBghTmuQB57nuixPhfR39pQVEGjvZzPjsij4lBKzZpswP3bRU-cN8_p82EDneim/exec";
 
-const API_URL="https://script.google.com/macros/s/AKfycbz5UUBghTmuQB57nuixPhfR39pQVEGjvZzPjsij4lBKzZpswP3bRU-cN8_p82EDneim/exec";
+function trackEvent(eventName, desa, object, duration = 0) {
+  const data = {
+    timestamp: new Date().toISOString(),
+    event: eventName,
+    desa: desa,
+    object: object,
+    device: navigator.userAgent,
+    duration: duration
+  };
 
-const params=new URLSearchParams(window.location.search);
-const desa=params.get("desa");
-const type=params.get("type");
-
-const container=document.getElementById("model-container");
-const musik=document.getElementById("musik-dayak");
-
-function trackEvent(eventName,desa,objek){
-
-fetch(API_URL,{
-method:"POST",
-mode:"no-cors",
-headers:{
-"Content-Type":"application/json"
-},
-body:JSON.stringify({
-timestamp:new Date().toISOString(),
-event:eventName,
-desa:desa,
-object:objek,
-device:navigator.userAgent
-})
-});
-
+  fetch(API_URL, {
+    method: "POST",
+    body: JSON.stringify(data)
+  })
+  .then(res => res.json())
+  .then(res => console.log("Tracking:", res))
+  .catch(err => console.error("Error:", err));
 }
-
-if(type==="rumah"){
-container.setAttribute("gltf-model","#rumah-sebujit");
-}
-
-if(type==="ritual"){
-container.setAttribute("gltf-model","#nyobeng-sebujit");
-}
-
-trackEvent("model_loaded",desa,type);
-
-musik.play();
-
 </script>
+<body>
+  <a-scene>
+    <a-assets>
+      <!-- Models -->
+      <a-asset-item id="rumah-sebujit" src="assets/rumah_sebujit.glb"></a-asset-item>
+      <a-asset-item id="nyobeng-sebujit" src="assets/nyobeng_sebujit.glb"></a-asset-item>
+      <a-asset-item id="rumah-jagoi" src="assets/rumah_jagoi.glb"></a-asset-item>
+      <a-asset-item id="gawia-jagoi" src="assets/gawia_jagoi.glb"></a-asset-item>
+
+      <!-- Audio -->
+      <audio id="narasi-sebujit-rumah" src="assets/narasi_rumah_sebujit.mp3"></audio>
+      <audio id="narasi-sebujit-ritual" src="assets/narasi_nyobeng.mp3"></audio>
+      <audio id="narasi-jagoi-rumah" src="assets/narasi_rumah_jagoi.mp3"></audio>
+      <audio id="narasi-jagoi-ritual" src="assets/narasi_gawia.mp3"></audio>
+      <audio id="musik-dayak" src="assets/dayak.mp3"></audio>
+    </a-assets>
+
+    <!-- Container untuk model -->
+    <a-entity id="model-container" position="0 0 -3"
+      animation="property: rotation; to: 0 360 0; loop: true; dur: 15000; easing: linear">
+    </a-entity>
+
+    <a-camera position="0 1.6 0"></a-camera>
+  </a-scene>
+
+  <div id="ui">
+    <button onclick="trackEvent('kembali_markerless', desa, type); window.location.href='index.html'">⬅ Kembali</button>
+  </div>
+
+  <script>
+    const params = new URLSearchParams(window.location.search);
+    const desa = params.get("desa");
+    const type = params.get("type");
+	
+	trackEvent("masuk_markerless", desa, type);
+	
+    const container = document.getElementById("model-container");
+    const musikDayak = document.getElementById("musik-dayak");
+	
+	let startTime = new Date().getTime();
+	
+    const config = {
+      sebujit: {
+        rumah: { model: "#rumah-sebujit", audio: "narasi-sebujit-rumah", scale: "0.4 0.4 0.4" },
+        ritual: { model: "#nyobeng-sebujit", audio: "narasi-sebujit-ritual", scale: "3 3 3" }
+      },
+      jagoi: {
+        rumah: { model: "#rumah-jagoi", audio: "narasi-jagoi-rumah", scale: "0.4 0.4 0.4" },
+        ritual: { model: "#gawia-jagoi", audio: "narasi-jagoi-ritual", scale: "1.2 1.2 1.2" }
+      }
+    };
+
+    const cfg = config[desa]?.[type];
+    if (cfg) {
+	  trackEvent("model_muncul", desa, type);
+      container.setAttribute("gltf-model", cfg.model);
+      container.setAttribute("scale", cfg.scale);
+
+      const narasi = document.getElementById(cfg.audio);
+      musikDayak.play();
+      narasi.play();
+    }
+	window.addEventListener("beforeunload", () => {
+		let endTime = new Date().getTime();
+		let duration = Math.floor((endTime - startTime) / 1000);
+
+		trackEvent("keluar_markerless", desa, type, duration);
+	});
+  </script>
+</body>
+</html>
+
+
+
