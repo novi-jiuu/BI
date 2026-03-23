@@ -73,9 +73,7 @@ function trackEvent(eventName, desa, object, duration = 0) {
     const desa = params.get("desa");
     const type = params.get("type");
 	
-	if (desa && type) {
-  trackEvent("masuk_markerless", desa, type);
-}
+	trackEvent("masuk_markerless", desa, type);
 	
     const container = document.getElementById("model-container");
     const musikDayak = document.getElementById("musik-dayak");
