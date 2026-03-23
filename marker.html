@@ -1,57 +1,10 @@
-<!DOCTYPE html>
-<html>
-<head>
-
-<meta charset="UTF-8">
-<title>WebAR Marker</title>
-
-<script src="https://aframe.io/releases/1.2.0/aframe.min.js"></script>
-<script src="https://cdn.jsdelivr.net/gh/AR-js-org/AR.js/aframe/build/aframe-ar.js"></script>
-
-<style>
-body{margin:0;overflow:hidden}
-#ui{position:fixed;bottom:20px;left:50%;transform:translateX(-50%)}
-button{padding:10px;background:#ff9800;color:white;border:none;border-radius:6px}
-</style>
-
-</head>
-
-<body>
-
-<a-scene embedded vr-mode-ui="enabled:false"
-arjs="trackingMethod:best;sourceType:webcam;debugUIEnabled:false">
-
-<a-assets>
-
-<a-asset-item id="rumah-sebujit" src="assets/rumah_sebujit.glb"></a-asset-item>
-<a-asset-item id="nyobeng-sebujit" src="assets/nyobeng_sebujit.glb"></a-asset-item>
-
-<audio id="narasi-sebujit-rumah" src="assets/narasi_rumah_sebujit.mp3"></audio>
-<audio id="narasi-sebujit-ritual" src="assets/narasi_nyobeng.mp3"></audio>
-
-<audio id="musik-dayak" src="assets/dayak.mp3"></audio>
-
-</a-assets>
-
-<a-marker id="marker" type="pattern"></a-marker>
-
-<a-entity camera></a-entity>
-
-</a-scene>
-
-<div id="ui">
-<button onclick="location.href='index.html'">Kembali</button>
-</div>
-
 <script>
 
-const API_URL="PASTE_URL_GOOGLE_APPS_SCRIPT";
+const API_URL="https://script.google.com/macros/s/AKfycbxIFfbwSdWVN241UJyyJ8ndkZUzTSgVs5C78DPZLh5EQJbd6sEjMiTlIvHJesuALn2F/exec";
 
 const params=new URLSearchParams(window.location.search);
 const desa=params.get("desa");
 const type=params.get("type");
-
-trackEvent("open_ar",desa,type);
 
 const marker=document.getElementById("marker");
 const musik=document.getElementById("musik-dayak");
@@ -60,15 +13,22 @@ function trackEvent(eventName,desa,objek){
 
 fetch(API_URL,{
 method:"POST",
+mode:"no-cors",
+headers:{
+"Content-Type":"application/json"
+},
 body:JSON.stringify({
 timestamp:new Date().toISOString(),
 event:eventName,
 desa:desa,
-object:objek
+object:objek,
+device:navigator.userAgent
 })
 });
 
 }
+
+trackEvent("open_ar",desa,type);
 
 marker.addEventListener("markerFound",()=>{
 
@@ -88,6 +48,3 @@ musik.currentTime=0;
 });
 
 </script>
-
-</body>
-</html>
