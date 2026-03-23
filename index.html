@@ -35,7 +35,6 @@ cursor:pointer;
 
 .marker{background:#ff9800;color:white}
 .markerless{background:#4caf50;color:white}
-
 </style>
 </head>
 
@@ -73,37 +72,11 @@ Markerless Nyobeng
 
 </div>
 
-
-<div class="desa">
-<h2>Desa Jagoi Babang</h2>
-
-<button class="marker"
-onclick="trackEvent('select_content','jagoi','rumah');location.href='marker.html?desa=jagoi&type=rumah'">
-Marker Rumah
-</button>
-
-<button class="marker"
-onclick="trackEvent('select_content','jagoi','ritual');location.href='marker.html?desa=jagoi&type=ritual'">
-Marker Gawia
-</button>
-
-<button class="markerless"
-onclick="trackEvent('select_content','jagoi','rumah');location.href='markerless.html?desa=jagoi&type=rumah'">
-Markerless Rumah
-</button>
-
-<button class="markerless"
-onclick="trackEvent('select_content','jagoi','ritual');location.href='markerless.html?desa=jagoi&type=ritual'">
-Markerless Gawia
-</button>
-
-</div>
-
 </main>
 
 <script>
 
-const API_URL="PASTE_URL_GOOGLE_APPS_SCRIPT";
+const API_URL="https://script.google.com/macros/s/AKfycbxIFfbwSdWVN241UJyyJ8ndkZUzTSgVs5C78DPZLh5EQJbd6sEjMiTlIvHJesuALn2F/exec";
 
 let startSession=Date.now();
 
@@ -111,6 +84,10 @@ function trackEvent(eventName,desa,objek){
 
 fetch(API_URL,{
 method:"POST",
+mode:"no-cors",
+headers:{
+"Content-Type":"application/json"
+},
 body:JSON.stringify({
 timestamp:new Date().toISOString(),
 event:eventName,
@@ -128,7 +105,12 @@ let duration=Math.floor((Date.now()-startSession)/1000);
 
 fetch(API_URL,{
 method:"POST",
+mode:"no-cors",
+headers:{
+"Content-Type":"application/json"
+},
 body:JSON.stringify({
+timestamp:new Date().toISOString(),
 event:"session_duration",
 duration:duration
 })
