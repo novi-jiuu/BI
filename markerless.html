@@ -16,8 +16,7 @@
       color: white; font-weight: bold; cursor: pointer;
     }
   </style>
-</head>
-<script>
+  <script>
 const API_URL = "https://script.google.com/macros/s/AKfycbz5UUBghTmuQB57nuixPhfR39pQVEGjvZzPjsij4lBKzZpswP3bRU-cN8_p82EDneim/exec";
 
 function trackEvent(eventName, desa, object, duration = 0) {
@@ -39,6 +38,7 @@ function trackEvent(eventName, desa, object, duration = 0) {
   .catch(err => console.error("Error:", err));
 }
 </script>
+</head>
 <body>
   <a-scene>
     <a-assets>
@@ -73,7 +73,9 @@ function trackEvent(eventName, desa, object, duration = 0) {
     const desa = params.get("desa");
     const type = params.get("type");
 	
-	trackEvent("masuk_markerless", desa, type);
+	if (desa && type) {
+  trackEvent("masuk_markerless", desa, type);
+}
 	
     const container = document.getElementById("model-container");
     const musikDayak = document.getElementById("musik-dayak");
