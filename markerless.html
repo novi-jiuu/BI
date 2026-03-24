@@ -6,24 +6,55 @@
   <script src="https://aframe.io/releases/1.4.0/aframe.min.js"></script>
   <script>
 const API_URL = "https://script.google.com/macros/s/AKfycbz5UUBghTmuQB57nuixPhfR39pQVEGjvZzPjsij4lBKzZpswP3bRU-cN8_p82EDneim/exec";
+function getDeviceInfo() {
+  const ua = navigator.userAgent;
 
+  let deviceType = "Unknown";
+  let os = "Unknown";
+
+  if (/Mobi|Android/i.test(ua)) {
+    deviceType = "Mobile";
+  } else if (/Tablet|iPad/i.test(ua)) {
+    deviceType = "Tablet";
+  } else {
+    deviceType = "Desktop";
+  }
+
+  if (/Android/i.test(ua)) {
+    os = "Android";
+  } else if (/iPhone|iPad|iPod/i.test(ua)) {
+    os = "iOS";
+  } else if (/Windows/i.test(ua)) {
+    os = "Windows";
+  } else if (/Mac/i.test(ua)) {
+    os = "MacOS";
+  } else if (/Linux/i.test(ua)) {
+    os = "Linux";
+  }
+
+  return {
+    deviceType,
+    os,
+    userAgent: ua
+  };
+}
 function trackEvent(eventName, desa, object, duration = 0) {
+  const device = getDeviceInfo();
+
   const data = {
     timestamp: new Date().toISOString(),
     event: eventName,
     desa: desa,
     object: object,
-    device: navigator.userAgent,
+    device: device.deviceType,
+    os: device.os,
     duration: duration
   };
 
   fetch(API_URL, {
     method: "POST",
     body: JSON.stringify(data)
-  })
-  .then(res => res.json())
-  .then(res => console.log("Tracking:", res))
-  .catch(err => console.error("Error:", err));
+  });
 }
 </script>
   <style>
@@ -65,7 +96,7 @@ function trackEvent(eventName, desa, object, duration = 0) {
   </a-scene>
 
   <div id="ui">
-    <button onclick="trackEvent('kembali_markerless', desa, type); window.location.href='index.html'">⬅ Kembali</button>
+    <button onclick="keluarHalaman()">⬅ Kembali</button>
   </div>
 
   <script>
@@ -103,12 +134,14 @@ function trackEvent(eventName, desa, object, duration = 0) {
       musikDayak.play();
       narasi.play();
     }
-	window.addEventListener("beforeunload", () => {
-		let endTime = new Date().getTime();
-		let duration = Math.floor((endTime - startTime) / 1000);
+	function keluarHalaman() {
+    let endTime = new Date().getTime();
+    let duration = Math.floor((endTime - startTime) / 1000);
 
-		trackEvent("keluar_markerless", desa, type, duration);
-	});
+    trackEvent("keluar_markerless", desa, type, duration);
+
+    window.location.href = "index.html";
+  }
   </script>
 </body>
 </html>
