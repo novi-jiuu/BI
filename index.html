@@ -5,15 +5,48 @@
   <title>WebAR Kearifan Lokal</title>
  <script>
 const API_URL = "https://script.google.com/macros/s/AKfycbz5UUBghTmuQB57nuixPhfR39pQVEGjvZzPjsij4lBKzZpswP3bRU-cN8_p82EDneim/exec";
+function getDeviceInfo() {
+  const ua = navigator.userAgent;
 
+  let deviceType = "Unknown";
+  let os = "Unknown";
+
+  if (/Mobi|Android/i.test(ua)) {
+    deviceType = "Mobile";
+  } else if (/Tablet|iPad/i.test(ua)) {
+    deviceType = "Tablet";
+  } else {
+    deviceType = "Desktop";
+  }
+
+  if (/Android/i.test(ua)) {
+    os = "Android";
+  } else if (/iPhone|iPad|iPod/i.test(ua)) {
+    os = "iOS";
+  } else if (/Windows/i.test(ua)) {
+    os = "Windows";
+  } else if (/Mac/i.test(ua)) {
+    os = "MacOS";
+  } else if (/Linux/i.test(ua)) {
+    os = "Linux";
+  }
+
+  return {
+    deviceType,
+    os,
+    userAgent: ua
+  };
+}
 // fungsi kirim data ke Google Sheets
 function trackEvent(eventName, desa, object) {
+  const device = getDeviceInfo();
   const data = {
     timestamp: new Date().toISOString(),
     event: eventName,
     desa: desa,
     object: object,
-    device: navigator.userAgent,
+    device: device.deviceType,
+    os: device.os,
     duration: "0"
   };
 
