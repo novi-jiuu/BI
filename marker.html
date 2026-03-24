@@ -160,10 +160,13 @@ function trackEvent(eventName, desa, object, duration = 0) {
 		window.location.href = "index.html";
 }
 	window.addEventListener("beforeunload", () => {
-  		let endTime = new Date().getTime();
-  		let duration = Math.floor((endTime - startTime) / 1000);
+  if (sudahKeluar) return;
+  sudahKeluar = true;
 
-  		trackEvent("keluar_marker", desa, type, duration);
+  let endTime = new Date().getTime();
+  let duration = Math.floor((endTime - startTime) / 1000);
+
+  trackEvent("keluar_marker", desa, type, duration);
 });
   </script>
 </body>
