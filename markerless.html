@@ -109,11 +109,9 @@ function trackEvent(eventName, desa, object, duration = 0) {
 }
 	
     const container = document.getElementById("model-container");
-const musikDayak = document.getElementById("musik-dayak");
-
-let startTime = new Date().getTime();
-let sudahKeluar = false;
-let narasi;
+    const musikDayak = document.getElementById("musik-dayak");
+	
+	let startTime = new Date().getTime();
 	
     const config = {
       sebujit: {
@@ -132,37 +130,26 @@ let narasi;
       container.setAttribute("gltf-model", cfg.model);
       container.setAttribute("scale", cfg.scale);
 
-      narasi = document.getElementById(cfg.audio);
-      musikDayak.play().catch(() => {});
-	narasi.play().catch(() => {});
+      const narasi = document.getElementById(cfg.audio);
+      musikDayak.play();
+      narasi.play();
     }
-	function kirimKeluar() {
+	function keluarHalaman() {
+    let endTime = new Date().getTime();
+    let duration = Math.floor((endTime - startTime) / 1000);
+
+    trackEvent("keluar_markerless", desa, type, duration);
+
+    window.location.href = "index.html";
+  }
+  window.addEventListener("beforeunload", () => {
   if (sudahKeluar) return;
   sudahKeluar = true;
 
   let endTime = new Date().getTime();
   let duration = Math.floor((endTime - startTime) / 1000);
-		
-  if (musikDayak) {
-    musikDayak.pause();
-    musikDayak.currentTime = 0;
-  }
-
-  if (narasi) {
-    narasi.pause();
-    narasi.currentTime = 0;
-  }
 
   trackEvent("keluar_markerless", desa, type, duration);
-}
-	function keluarHalaman() {
-  kirimKeluar(); // ✅ ganti
-  window.location.href = "index.html";
-}
-	document.addEventListener("visibilitychange", () => {
-  if (document.visibilityState === "hidden") {
-    kirimKeluar();
-  }
 });
   </script>
 </body>
