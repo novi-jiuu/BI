@@ -4,11 +4,9 @@
   <meta charset="UTF-8" />
   <title>WebAR Marker</title>
   <script src="https://aframe.io/releases/1.2.0/aframe.min.js"></script>
-  <script src="https://raw.githack.com/AR-js-org/AR.js/3.4.5/aframe/build/aframe-ar.js"></script>
+  <script src="https://cdn.jsdelivr.net/gh/AR-js-org/AR.js/aframe/build/aframe-ar.js"></script>
   <script>
 const API_URL = "https://script.google.com/macros/s/AKfycbz5UUBghTmuQB57nuixPhfR39pQVEGjvZzPjsij4lBKzZpswP3bRU-cN8_p82EDneim/exec";
-const isMobile = /Mobi|Android/i.test(navigator.userAgent);
-const facingMode = isMobile ? "environment": "user";
 function getDeviceInfo() {
   const ua = navigator.userAgent;
 
@@ -75,13 +73,8 @@ function trackEvent(eventName, desa, object, duration = 0) {
   </style>
 </head>
 <body>
-  <a-scene
-  embedded
-  vr-mode-ui="enabled:false"
-  renderer="logarithmicDepthBuffer:true;"
-  arjs="sourceType:webcam; videoTexture:true; debugUIEnabled:false;">
-	<a-entity camera look-controls="enabled:false"></a-entity>
-
+  <a-scene embedded vr-mode-ui="enabled: false"
+    arjs="trackingMethod: best; sourceType: webcam; debugUIEnabled: false;">
     <a-assets>
       <!-- Models -->
       <a-asset-item id="rumah-sebujit" src="assets/rumah_sebujit.glb"></a-asset-item>
@@ -107,7 +100,6 @@ function trackEvent(eventName, desa, object, duration = 0) {
 
   <script>
     const params = new URLSearchParams(window.location.search);
-	let sudahKeluar = false;
     const desa = params.get("desa");
     const type = params.get("type");
 	
@@ -179,3 +171,4 @@ window.addEventListener("beforeunload", () => {
   </script>
 </body>
 </html>
+
