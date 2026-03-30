@@ -110,8 +110,6 @@ function trackEvent(eventName, desa, object, duration = 0) {
     const musikDayak = document.getElementById("musik-dayak");
 	const marker = document.getElementById("marker");
 	let startTime = new Date().getTime();
-	let sudahKeluar = false;
-	let narasi;
 
     const config = {
       sebujit: {
@@ -133,13 +131,13 @@ function trackEvent(eventName, desa, object, duration = 0) {
       entity.setAttribute("animation", "property: rotation; to: 0 360 0; loop: true; dur: 15000; easing: linear");
       marker.appendChild(entity);
 
-      narasi = document.getElementById(cfg.audio);
+      const narasi = document.getElementById(cfg.audio);
       marker.addEventListener("markerFound", () => {
 		startTime = new Date().getTime();
 		trackEvent("marker_terdeteksi", desa, type);
 
-		musikDayak.play().catch(() => {});
-		narasi.play().catch(() => {});
+		musikDayak.play();
+		narasi.play();
 	  });
 	  marker.addEventListener("markerLost", () => {
 		let endTime = new Date().getTime();
@@ -153,33 +151,22 @@ function trackEvent(eventName, desa, object, duration = 0) {
 		narasi.currentTime = 0;
 });
 }
-	function kirimKeluar() {
+	function keluarHalaman() {
+		let endTime = new Date().getTime();
+		let duration = Math.floor((endTime - startTime) / 1000);
+
+		trackEvent("keluar_marker", desa, type, duration);
+
+		window.location.href = "index.html";
+}
+window.addEventListener("beforeunload", () => {
   if (sudahKeluar) return;
   sudahKeluar = true;
 
   let endTime = new Date().getTime();
   let duration = Math.floor((endTime - startTime) / 1000);
 
-  if (musikDayak) {
-    musikDayak.pause();
-    musikDayak.currentTime = 0;
-  }
-
-  if (narasi) {
-    narasi.pause();
-    narasi.currentTime = 0;
-  }
-
   trackEvent("keluar_marker", desa, type, duration);
-}
-	function keluarHalaman() {
-		kirimKeluar();
-  window.location.href = "index.html";
-}
-	document.addEventListener("visibilitychange", () => {
-  if (document.visibilityState === "hidden") {
-    kirimKeluar();
-  }
 });
   </script>
 </body>
