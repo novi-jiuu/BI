@@ -138,8 +138,8 @@ function trackEvent(eventName, desa, object, duration = 0) {
 		startTime = new Date().getTime();
 		trackEvent("marker_terdeteksi", desa, type);
 
-		musikDayak.play();
-		narasi.play();
+		musikDayak.play().catch(() => {});
+		narasi.play().catch(() => {});
 	  });
 	  marker.addEventListener("markerLost", () => {
 		let endTime = new Date().getTime();
@@ -170,7 +170,7 @@ function trackEvent(eventName, desa, object, duration = 0) {
     narasi.currentTime = 0;
   }
 
-  trackEvent("view_marker", desa, type, duration);
+  trackEvent("keluar_marker", desa, type, duration);
 }
 	function keluarHalaman() {
 		kirimKeluar();
