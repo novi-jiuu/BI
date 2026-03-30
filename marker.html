@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <title>WebAR Marker</title>
   <script src="https://aframe.io/releases/1.2.0/aframe.min.js"></script>
-  <script src="https://raw.githack.com/AR-js-org/AR.js/master/aframe/build/aframe-ar.js"></script>
+  <script src="https://raw.githack.com/AR-js-org/AR.js/3.4.5/aframe/build/aframe-ar.js"></script>
   <script>
 const API_URL = "https://script.google.com/macros/s/AKfycbz5UUBghTmuQB57nuixPhfR39pQVEGjvZzPjsij4lBKzZpswP3bRU-cN8_p82EDneim/exec";
 const isMobile = /Mobi|Android/i.test(navigator.userAgent);
@@ -75,9 +75,12 @@ function trackEvent(eventName, desa, object, duration = 0) {
   </style>
 </head>
 <body>
-  <a-scene embedded vr-mode-ui="enabled:false"
+  <a-scene
+  embedded
+  vr-mode-ui="enabled:false"
   renderer="logarithmicDepthBuffer:true;"
-  arjs="sourceType:webcam; debugUIEnabled:false;">
+  arjs="sourceType:webcam; videoTexture:true; debugUIEnabled:false;">
+	<a-entity camera look-controls="enabled:false"></a-entity>
 
     <a-assets>
       <!-- Models -->
