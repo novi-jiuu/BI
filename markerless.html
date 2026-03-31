@@ -51,10 +51,9 @@ function trackEvent(eventName, desa, object, duration = 0) {
     duration: duration
   };
 
-  fetch(API_URL, {
-    method: "POST",
-    body: JSON.stringify(data)
-  });
+  const blob = new Blob([JSON.stringify(data)], { type: "application/json" });
+
+  navigator.sendBeacon(API_URL, blob); 
 }
 </script>
   <style>
@@ -112,6 +111,7 @@ function trackEvent(eventName, desa, object, duration = 0) {
     const musikDayak = document.getElementById("musik-dayak");
 	
 	let startTime = new Date().getTime();
+	let sudahKeluar = false;
 	
     const config = {
       sebujit: {
@@ -126,6 +126,7 @@ function trackEvent(eventName, desa, object, duration = 0) {
 
     const cfg = config[desa]?.[type];
     if (cfg) {
+	  startTime = new Date().getTime();
 	  trackEvent("model_muncul", desa, type);
       container.setAttribute("gltf-model", cfg.model);
       container.setAttribute("scale", cfg.scale);
@@ -135,14 +136,32 @@ function trackEvent(eventName, desa, object, duration = 0) {
       narasi.play();
     }
 	function keluarHalaman() {
+  if (!sudahKeluar) {
+    sudahKeluar = true;
+
     let endTime = new Date().getTime();
     let duration = Math.floor((endTime - startTime) / 1000);
 
     trackEvent("keluar_markerless", desa, type, duration);
-
-    window.location.href = "index.html";
   }
-  window.addEventListener("beforeunload", () => {
+
+  window.location.href = "index.html";
+}
+  // ✅ Deteksi keluar (HP & tab switch)
+document.addEventListener("visibilitychange", () => {
+  if (document.visibilityState === "hidden") {
+    if (sudahKeluar) return;
+    sudahKeluar = true;
+
+    let endTime = new Date().getTime();
+    let duration = Math.floor((endTime - startTime) / 1000);
+
+    trackEvent("keluar_markerless", desa, type, duration);
+  }
+});
+
+
+window.addEventListener("pagehide", () => {
   if (sudahKeluar) return;
   sudahKeluar = true;
 
