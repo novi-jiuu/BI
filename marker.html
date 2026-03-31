@@ -53,10 +53,9 @@ function trackEvent(eventName, desa, object, duration = 0) {
     duration: duration
   };
 
-  fetch(API_URL, {
-    method: "POST",
-    body: JSON.stringify(data)
-  });
+  const blob = new Blob([JSON.stringify(data)], { type: "application/json" });
+
+  navigator.sendBeacon(API_URL, blob);
 }
 </script>
   <style>
@@ -110,6 +109,7 @@ function trackEvent(eventName, desa, object, duration = 0) {
     const musikDayak = document.getElementById("musik-dayak");
 	const marker = document.getElementById("marker");
 	let startTime = new Date().getTime();
+	let sudahKeluar = false;
 
     const config = {
       sebujit: {
@@ -152,14 +152,31 @@ function trackEvent(eventName, desa, object, duration = 0) {
 });
 }
 	function keluarHalaman() {
-		let endTime = new Date().getTime();
-		let duration = Math.floor((endTime - startTime) / 1000);
+  if (!sudahKeluar) {
+    sudahKeluar = true;
 
-		trackEvent("keluar_marker", desa, type, duration);
+    let endTime = new Date().getTime();
+    let duration = Math.floor((endTime - startTime) / 1000);
 
-		window.location.href = "index.html";
+    trackEvent("keluar_marker", desa, type, duration);
+  }
+
+  window.location.href = "index.html";
 }
-window.addEventListener("beforeunload", () => {
+	  
+document.addEventListener("visibilitychange", () => {
+  if (document.visibilityState === "hidden") {
+    if (sudahKeluar) return;
+    sudahKeluar = true;
+
+    let endTime = new Date().getTime();
+    let duration = Math.floor((endTime - startTime) / 1000);
+
+    trackEvent("keluar_marker", desa, type, duration);
+  }
+});
+
+window.addEventListener("pagehide", () => {
   if (sudahKeluar) return;
   sudahKeluar = true;
 
