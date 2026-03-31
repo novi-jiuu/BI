@@ -55,7 +55,21 @@ function trackEvent(eventName, desa, object, duration = 0) {
 
   const blob = new Blob([JSON.stringify(data)], { type: "application/json" });
 
-  navigator.sendBeacon(API_URL, blob);
+const success = navigator.sendBeacon(API_URL, blob);
+
+
+if (!success) {
+  fetch(API_URL, {
+    method: "POST",
+    body: JSON.stringify(data),
+    headers: {
+      "Content-Type": "application/json"
+    }
+  });
+}
+
+
+console.log("TRACK:", eventName, desa, object, duration);
 }
 </script>
   <style>
@@ -102,9 +116,11 @@ function trackEvent(eventName, desa, object, duration = 0) {
     const desa = params.get("desa");
     const type = params.get("type");
 	
-	if (desa && type) {
-  trackEvent("masuk_marker", desa, type);
-}
+	window.addEventListener("load", () => {
+  if (desa && type) {
+    trackEvent("masuk_marker", desa, type);
+  }
+});
 	
     const musikDayak = document.getElementById("musik-dayak");
 	const marker = document.getElementById("marker");
@@ -133,22 +149,30 @@ function trackEvent(eventName, desa, object, duration = 0) {
 
       const narasi = document.getElementById(cfg.audio);
       marker.addEventListener("markerFound", () => {
-		startTime = new Date().getTime();
-		trackEvent("marker_terdeteksi", desa, type);
+  setTimeout(() => {
+    startTime = new Date().getTime();
 
-		musikDayak.play();
-		narasi.play();
-	  });
+    trackEvent("marker_terdeteksi", desa, type);
+
+    document.body.addEventListener("click", () => {
+      musikDayak.play().catch(() => {});
+      narasi.play().catch(() => {});
+    }, { once: true });
+
+  }, 300);
+});
 	  marker.addEventListener("markerLost", () => {
-		let endTime = new Date().getTime();
-		let duration = Math.floor((endTime - startTime) / 1000);
+  setTimeout(() => {
+    let endTime = new Date().getTime();
+    let duration = Math.floor((endTime - startTime) / 1000);
 
-		trackEvent("marker_hilang", desa, type, duration);
+    trackEvent("marker_hilang", desa, type, duration);
 
-		musikDayak.pause();
-		musikDayak.currentTime = 0;
-		narasi.pause();
-		narasi.currentTime = 0;
+    musikDayak.pause();
+    musikDayak.currentTime = 0;
+    narasi.pause();
+    narasi.currentTime = 0;
+  }, 200);
 });
 }
 	function keluarHalaman() {
@@ -161,7 +185,9 @@ function trackEvent(eventName, desa, object, duration = 0) {
     trackEvent("keluar_marker", desa, type, duration);
   }
 
-  window.location.href = "index.html";
+  setTimeout(() => {
+    window.location.href = "index.html";
+  }, 150);
 }
 	  
 document.addEventListener("visibilitychange", () => {
