@@ -37,9 +37,10 @@ function getDeviceInfo() {
     userAgent: ua
   };
 }
-// fungsi kirim data ke Google Sheets
+   
 function trackEvent(eventName, desa, object) {
   const device = getDeviceInfo();
+
   const data = {
     timestamp: new Date().toISOString(),
     event: eventName,
@@ -51,10 +52,20 @@ function trackEvent(eventName, desa, object) {
   };
 
   const blob = new Blob([JSON.stringify(data)], { type: "application/json" });
-navigator.sendBeacon(API_URL, blob);
-  .then(res => res.json())
-  .then(res => console.log("Tracking sukses:", res))
-  .catch(err => console.error("Tracking error:", err));
+
+  const success = navigator.sendBeacon(API_URL, blob);
+
+  if (!success) {
+    fetch(API_URL, {
+      method: "POST",
+      body: JSON.stringify(data),
+      headers: {
+        "Content-Type": "application/json"
+      }
+    }).catch(err => console.log("Tracking error:", err));
+  }
+
+  console.log("TRACK:", eventName);
 }
    function goToAR(eventName, desa, object, url) {
   trackEvent(eventName, desa, object);
@@ -148,9 +159,6 @@ navigator.sendBeacon(API_URL, blob);
     <div class="desa">
       <h2>🏡 Desa Sebujit</h2>
       <div class="btn-group">
-        <button onclick="window.location.href='marker.html?desa=sebujit&type=rumah'">
-  TEST MASUK
-</button>
         <button class="marker" onclick="goToAR('klik_marker_rumah','sebujit','rumah','marker.html?desa=sebujit&type=rumah')">📷 Marker - Rumah</button>
         <button class="marker" onclick="goToAR('klik_marker_ritual','sebujit','nyobeng','marker.html?desa=sebujit&type=ritual')">📷 Marker - Nyobeng</button>
         <button class="markerless" onclick="goToAR('klik_markerless_rumah','sebujit','rumah','markerless.html?desa=sebujit&type=rumah')">🌍 Markerless - Rumah</button>
