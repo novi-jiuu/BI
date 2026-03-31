@@ -6,7 +6,7 @@
   <script src="https://aframe.io/releases/1.2.0/aframe.min.js"></script>
   <script src="https://cdn.jsdelivr.net/gh/AR-js-org/AR.js/aframe/build/aframe-ar.js"></script>
   <script>
-const API_URL = "https://script.google.com/macros/s/AKfycbyTxaTHt9SS9P_WKbJgYNSZiRySdHkbTxutigU8BbABZCqaKRzMsoEVT7_QRw29WAK8/exec";
+const API_URL = "https://script.google.com/macros/s/AKfycbxmHCUinmwyMNHr6uNHU_f3dQfcpSJqx5XFdEa4CVjuEdcFoe7sF9cHcaX6kV96gJ-u/exec";
 function getDeviceInfo() {
   const ua = navigator.userAgent;
 
@@ -53,23 +53,10 @@ function trackEvent(eventName, desa, object, duration = 0) {
     duration: duration
   };
 
-  const blob = new Blob([JSON.stringify(data)], { type: "application/json" });
-
-const success = navigator.sendBeacon(API_URL, blob);
-
-
-if (!success) {
   fetch(API_URL, {
     method: "POST",
-    body: JSON.stringify(data),
-    headers: {
-      "Content-Type": "application/json"
-    }
+    body: JSON.stringify(data)
   });
-}
-
-
-console.log("TRACK:", eventName, desa, object, duration);
 }
 </script>
   <style>
@@ -116,16 +103,13 @@ console.log("TRACK:", eventName, desa, object, duration);
     const desa = params.get("desa");
     const type = params.get("type");
 	
-	window.addEventListener("load", () => {
-  if (desa && type) {
-    trackEvent("masuk_marker", desa, type);
-  }
-});
+	if (desa && type) {
+  trackEvent("masuk_marker", desa, type);
+}
 	
     const musikDayak = document.getElementById("musik-dayak");
 	const marker = document.getElementById("marker");
 	let startTime = new Date().getTime();
-	let sudahKeluar = false;
 
     const config = {
       sebujit: {
@@ -149,60 +133,33 @@ console.log("TRACK:", eventName, desa, object, duration);
 
       const narasi = document.getElementById(cfg.audio);
       marker.addEventListener("markerFound", () => {
-  setTimeout(() => {
-    startTime = new Date().getTime();
+		startTime = new Date().getTime();
+		trackEvent("marker_terdeteksi", desa, type);
 
-    trackEvent("marker_terdeteksi", desa, type);
-
-    document.body.addEventListener("click", () => {
-      musikDayak.play().catch(() => {});
-      narasi.play().catch(() => {});
-    }, { once: true });
-
-  }, 300);
-});
+		musikDayak.play();
+		narasi.play();
+	  });
 	  marker.addEventListener("markerLost", () => {
-  setTimeout(() => {
-    let endTime = new Date().getTime();
-    let duration = Math.floor((endTime - startTime) / 1000);
+		let endTime = new Date().getTime();
+		let duration = Math.floor((endTime - startTime) / 1000);
 
-    trackEvent("marker_hilang", desa, type, duration);
+		trackEvent("marker_hilang", desa, type, duration);
 
-    musikDayak.pause();
-    musikDayak.currentTime = 0;
-    narasi.pause();
-    narasi.currentTime = 0;
-  }, 200);
+		musikDayak.pause();
+		musikDayak.currentTime = 0;
+		narasi.pause();
+		narasi.currentTime = 0;
 });
 }
 	function keluarHalaman() {
-  if (!sudahKeluar) {
-    sudahKeluar = true;
+		let endTime = new Date().getTime();
+		let duration = Math.floor((endTime - startTime) / 1000);
 
-    let endTime = new Date().getTime();
-    let duration = Math.floor((endTime - startTime) / 1000);
+		trackEvent("keluar_marker", desa, type, duration);
 
-    trackEvent("keluar_marker", desa, type, duration);
-  }
-
-  setTimeout(() => {
-    window.location.href = "index.html";
-  }, 150);
+		window.location.href = "index.html";
 }
-	  
-document.addEventListener("visibilitychange", () => {
-  if (document.visibilityState === "hidden") {
-    if (sudahKeluar) return;
-    sudahKeluar = true;
-
-    let endTime = new Date().getTime();
-    let duration = Math.floor((endTime - startTime) / 1000);
-
-    trackEvent("keluar_marker", desa, type, duration);
-  }
-});
-
-window.addEventListener("pagehide", () => {
+window.addEventListener("beforeunload", () => {
   if (sudahKeluar) return;
   sudahKeluar = true;
 
@@ -214,4 +171,8 @@ window.addEventListener("pagehide", () => {
   </script>
 </body>
 </html>
+
+
+
+
 
