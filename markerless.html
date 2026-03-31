@@ -5,7 +5,7 @@
   <title>WebAR Markerless</title>
   <script src="https://aframe.io/releases/1.4.0/aframe.min.js"></script>
   <script>
-const API_URL = "https://script.google.com/macros/s/AKfycbyTxaTHt9SS9P_WKbJgYNSZiRySdHkbTxutigU8BbABZCqaKRzMsoEVT7_QRw29WAK8/exec";
+const API_URL = "https://script.google.com/macros/s/AKfycbxmHCUinmwyMNHr6uNHU_f3dQfcpSJqx5XFdEa4CVjuEdcFoe7sF9cHcaX6kV96gJ-u/exec";
 function getDeviceInfo() {
   const ua = navigator.userAgent;
 
@@ -51,21 +51,11 @@ function trackEvent(eventName, desa, object, duration = 0) {
     duration: duration
   };
 
-  const blob = new Blob([JSON.stringify(data)], { type: "application/json" });
-
-  const success = navigator.sendBeacon(API_URL, blob);
-
-if (!success) {
   fetch(API_URL, {
     method: "POST",
-    body: JSON.stringify(data),
-    headers: {
-      "Content-Type": "application/json"
-    }
+    body: JSON.stringify(data)
   });
 }
-
-console.log("TRACK:", eventName); 
 </script>
   <style>
     body { margin: 0; overflow: hidden; }
@@ -114,17 +104,14 @@ console.log("TRACK:", eventName);
     const desa = params.get("desa");
     const type = params.get("type");
 	
-	window.addEventListener("load", () => {
-  if (desa && type) {
-    trackEvent("masuk_markerless", desa, type);
-  }
-});
+	if (desa && type) {
+  trackEvent("masuk_markerless", desa, type);
+}
 	
     const container = document.getElementById("model-container");
     const musikDayak = document.getElementById("musik-dayak");
 	
 	let startTime = new Date().getTime();
-	let sudahKeluar = false;
 	
     const config = {
       sebujit: {
@@ -139,37 +126,23 @@ console.log("TRACK:", eventName);
 
     const cfg = config[desa]?.[type];
     if (cfg) {
-  startTime = new Date().getTime();
-  trackEvent("model_muncul", desa, type);
+	  trackEvent("model_muncul", desa, type);
+      container.setAttribute("gltf-model", cfg.model);
+      container.setAttribute("scale", cfg.scale);
+
+      const narasi = document.getElementById(cfg.audio);
+      musikDayak.play();
+      narasi.play();
+    }
 	function keluarHalaman() {
-  if (!sudahKeluar) {
-    sudahKeluar = true;
-
     let endTime = new Date().getTime();
     let duration = Math.floor((endTime - startTime) / 1000);
 
     trackEvent("keluar_markerless", desa, type, duration);
-  }
 
-  setTimeout(() => {
     window.location.href = "index.html";
-  }, 150);
-}
-  
-document.addEventListener("visibilitychange", () => {
-  if (document.visibilityState === "hidden") {
-    if (sudahKeluar) return;
-    sudahKeluar = true;
-
-    let endTime = new Date().getTime();
-    let duration = Math.floor((endTime - startTime) / 1000);
-
-    trackEvent("keluar_markerless", desa, type, duration);
   }
-});
-
-
-window.addEventListener("pagehide", () => {
+  window.addEventListener("beforeunload", () => {
   if (sudahKeluar) return;
   sudahKeluar = true;
 
