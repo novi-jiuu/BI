@@ -53,8 +53,19 @@ function trackEvent(eventName, desa, object, duration = 0) {
 
   const blob = new Blob([JSON.stringify(data)], { type: "application/json" });
 
-  navigator.sendBeacon(API_URL, blob); 
+  const success = navigator.sendBeacon(API_URL, blob);
+
+if (!success) {
+  fetch(API_URL, {
+    method: "POST",
+    body: JSON.stringify(data),
+    headers: {
+      "Content-Type": "application/json"
+    }
+  });
 }
+
+console.log("TRACK:", eventName); 
 </script>
   <style>
     body { margin: 0; overflow: hidden; }
@@ -103,9 +114,11 @@ function trackEvent(eventName, desa, object, duration = 0) {
     const desa = params.get("desa");
     const type = params.get("type");
 	
-	if (desa && type) {
-  trackEvent("masuk_markerless", desa, type);
-}
+	window.addEventListener("load", () => {
+  if (desa && type) {
+    trackEvent("masuk_markerless", desa, type);
+  }
+});
 	
     const container = document.getElementById("model-container");
     const musikDayak = document.getElementById("musik-dayak");
@@ -126,15 +139,8 @@ function trackEvent(eventName, desa, object, duration = 0) {
 
     const cfg = config[desa]?.[type];
     if (cfg) {
-	  startTime = new Date().getTime();
-	  trackEvent("model_muncul", desa, type);
-      container.setAttribute("gltf-model", cfg.model);
-      container.setAttribute("scale", cfg.scale);
-
-      const narasi = document.getElementById(cfg.audio);
-      musikDayak.play();
-      narasi.play();
-    }
+  startTime = new Date().getTime();
+  trackEvent("model_muncul", desa, type);
 	function keluarHalaman() {
   if (!sudahKeluar) {
     sudahKeluar = true;
@@ -145,9 +151,11 @@ function trackEvent(eventName, desa, object, duration = 0) {
     trackEvent("keluar_markerless", desa, type, duration);
   }
 
-  window.location.href = "index.html";
+  setTimeout(() => {
+    window.location.href = "index.html";
+  }, 150);
 }
-  // ✅ Deteksi keluar (HP & tab switch)
+  
 document.addEventListener("visibilitychange", () => {
   if (document.visibilityState === "hidden") {
     if (sudahKeluar) return;
