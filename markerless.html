@@ -129,15 +129,27 @@ function trackEvent(eventName, desa, object, duration = 0) {
     };
 
     const cfg = config[desa]?.[type];
-    if (cfg) {
-	  trackEvent("model_muncul", desa, type);
-      container.setAttribute("gltf-model", cfg.model);
-      container.setAttribute("scale", cfg.scale);
+	if (cfg) {
 
-      const narasi = document.getElementById(cfg.audio);
-      musikDayak.play();
-      narasi.play();
-    }
+  	const device = getDeviceInfo(); 
+
+    navigator.sendBeacon(API_URL, JSON.stringify({
+    timestamp: new Date().toISOString(),
+    event: "model_muncul",
+    desa: desa,
+    object: type,
+    device: device.deviceType, 
+    os: device.os,             
+    duration: 0
+  }));
+
+  container.setAttribute("gltf-model", cfg.model);
+  container.setAttribute("scale", cfg.scale);
+
+  const narasi = document.getElementById(cfg.audio);
+  musikDayak.play();
+  narasi.play();
+}
 	function keluarHalaman() {
     let endTime = new Date().getTime();
     let duration = Math.floor((endTime - startTime) / 1000);
