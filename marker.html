@@ -138,7 +138,15 @@ function trackEvent(eventName, desa, object, duration = 0) {
       const narasi = document.getElementById(cfg.audio);
       marker.addEventListener("markerFound", () => {
 		startTime = new Date().getTime();
-		trackEvent("marker_terdeteksi", desa, type);
+		navigator.sendBeacon(API_URL, JSON.stringify({
+  		timestamp: new Date().toISOString(),
+  		event: "marker_terdeteksi",
+  		desa: desa,
+  		object: type,
+  		device: getDeviceInfo().deviceType,
+  		os: getDeviceInfo().os,
+  		duration: 0
+	}));
 
 		musikDayak.play();
 		narasi.play();
