@@ -51,10 +51,13 @@ function trackEvent(eventName, desa, object, duration = 0) {
     duration: duration
   };
 
-  fetch(API_URL, {
-    method: "POST",
-    body: JSON.stringify(data)
-  });
+  return fetch(API_URL, {
+  method: "POST",
+  headers: {
+    "Content-Type": "application/json"
+  },
+  body: JSON.stringify(data)
+});
 }
 </script>
   <style>
@@ -100,6 +103,7 @@ function trackEvent(eventName, desa, object, duration = 0) {
   </div>
 
   <script>
+	let sudahKeluar = false;
     const params = new URLSearchParams(window.location.search);
     const desa = params.get("desa");
     const type = params.get("type");
@@ -138,9 +142,10 @@ function trackEvent(eventName, desa, object, duration = 0) {
     let endTime = new Date().getTime();
     let duration = Math.floor((endTime - startTime) / 1000);
 
-    trackEvent("keluar_markerless", desa, type, duration);
-
+    trackEvent("keluar_markerless", desa, type, duration)
+  .then(() => {
     window.location.href = "index.html";
+  });
   }
   window.addEventListener("beforeunload", () => {
   if (sudahKeluar) return;
@@ -149,8 +154,16 @@ function trackEvent(eventName, desa, object, duration = 0) {
   let endTime = new Date().getTime();
   let duration = Math.floor((endTime - startTime) / 1000);
 
-  trackEvent("keluar_markerless", desa, type, duration);
-});
+  navigator.sendBeacon(API_URL, JSON.stringify({
+  timestamp: new Date().toISOString(),
+  event: "keluar_markerless",
+  desa: desa,
+  object: type,
+  device: getDeviceInfo().deviceType,
+  os: getDeviceInfo().os,
+  duration: duration
+}));
+  });
   </script>
 </body>
 </html>
