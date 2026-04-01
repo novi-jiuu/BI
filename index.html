@@ -50,14 +50,13 @@ function trackEvent(eventName, desa, object) {
     duration: "0"
   };
 
-  fetch(API_URL, {
-  method: "POST",
-  headers: {
-    "Content-Type": "application/json"
-  },
-  body: JSON.stringify(data)
-})
-.catch(err => console.error("Tracking error:", err));
+  return fetch(API_URL, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify(data)
+  }).catch(err => console.error("Tracking error:", err));
 }
    function goToPage(eventName, desa, object, url) {
   trackEvent(eventName, desa, object)
