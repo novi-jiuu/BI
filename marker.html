@@ -152,15 +152,25 @@ function trackEvent(eventName, desa, object, duration = 0) {
 		narasi.play();
 	  });
 	  marker.addEventListener("markerLost", () => {
-		let endTime = new Date().getTime();
-		let duration = Math.floor((endTime - startTime) / 1000);
+  let endTime = new Date().getTime();
+  let duration = Math.floor((endTime - startTime) / 1000);
 
-		trackEvent("marker_hilang", desa, type, duration);
+  const device = getDeviceInfo();
 
-		musikDayak.pause();
-		musikDayak.currentTime = 0;
-		narasi.pause();
-		narasi.currentTime = 0;
+  navigator.sendBeacon(API_URL, JSON.stringify({
+    timestamp: new Date().toISOString(),
+    event: "marker_hilang",
+    desa: desa,
+    object: type,
+    device: device.deviceType,
+    os: device.os,
+    duration: duration
+  }));
+
+  musikDayak.pause();
+  musikDayak.currentTime = 0;
+  narasi.pause();
+  narasi.currentTime = 0;
 });
 }
 	function keluarHalaman() {
