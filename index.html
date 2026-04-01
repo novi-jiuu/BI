@@ -50,19 +50,11 @@ function trackEvent(eventName, desa, object) {
     duration: "0"
   };
 
-  return fetch(API_URL, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json"
-    },
-    body: JSON.stringify(data)
-  }).catch(err => console.error("Tracking error:", err));
+  navigator.sendBeacon(API_URL, JSON.stringify(data));
 }
    function goToPage(eventName, desa, object, url) {
-  trackEvent(eventName, desa, object)
-    .finally(() => {
-      window.location.href = url;
-    });
+  trackEvent(eventName, desa, object);
+  window.location.href = url;
 }
 </script>
   <style>
