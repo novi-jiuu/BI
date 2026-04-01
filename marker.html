@@ -172,7 +172,7 @@ marker.addEventListener("markerLost", () => {
 
     let endTime = new Date().getTime();
     let duration = Math.floor((endTime - startTime) / 1000);
-
+	totalDurasi += duration;
     const device = getDeviceInfo();
 
     navigator.sendBeacon(API_URL, JSON.stringify({
@@ -198,10 +198,10 @@ marker.addEventListener("markerLost", () => {
 }
 	function keluarHalaman() {
 		let endTime = new Date().getTime();
-		let duration = 0;
+		let duration = totalDurasi;
 
-	if (startTime) {
-  		duration = Math.floor((endTime - startTime) / 1000);
+if (startTime) {
+  duration += Math.floor((endTime - startTime) / 1000);
 }
 
 		trackEvent("keluar_marker", desa, type, duration)
@@ -214,10 +214,10 @@ window.addEventListener("beforeunload", () => {
   sudahKeluar = true;
 
   let endTime = new Date().getTime();
-  let duration = 0;
+  let duration = totalDurasi;
 
-  if (startTime) {
-    duration = Math.floor((endTime - startTime) / 1000);
+if (startTime) {
+  duration += Math.floor((endTime - startTime) / 1000);
 }
 
   navigator.sendBeacon(API_URL, JSON.stringify({
