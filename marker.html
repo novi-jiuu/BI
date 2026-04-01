@@ -113,8 +113,9 @@ function trackEvent(eventName, desa, object, duration = 0) {
 	
     const musikDayak = document.getElementById("musik-dayak");
 	const marker = document.getElementById("marker");
-	let startTime = new Date().getTime();
 
+	let startTime = null;
+	let isMarkerVisible = false;
     const config = {
       sebujit: {
         rumah: { model: "#rumah-sebujit", patt: "assets/marker_rumah_sebujit.patt", audio: "narasi-sebujit-rumah", scale: "0.4 0.4 0.4" },
@@ -138,9 +139,10 @@ function trackEvent(eventName, desa, object, duration = 0) {
       const narasi = document.getElementById(cfg.audio);
 
 marker.addEventListener("markerFound", () => {
-  if (!startTime) {
-    startTime = new Date().getTime();
-  }
+  if (isMarkerVisible) return;
+
+  isMarkerVisible = true;
+  startTime = new Date().getTime();
 
   const device = getDeviceInfo();
 
@@ -158,7 +160,7 @@ marker.addEventListener("markerFound", () => {
   narasi.play();
 });
 	  marker.addEventListener("markerLost", () => {
-  if (!startTime) return;
+  if (!isMarkerVisible || !startTime) return;
 
   let endTime = new Date().getTime();
   let duration = Math.floor((endTime - startTime) / 1000);
@@ -175,6 +177,7 @@ marker.addEventListener("markerFound", () => {
     duration: duration
   }));
 
+  isMarkerVisible = false;
   startTime = null;
 
   musikDayak.pause();
