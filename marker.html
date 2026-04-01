@@ -160,7 +160,7 @@ function trackEvent(eventName, desa, object, duration = 0) {
 		let duration = Math.floor((endTime - startTime) / 1000);
 
 		trackEvent("keluar_marker", desa, type, duration)
-  .then(() => {
+  .finally(() => {
     window.location.href = "index.html";
   });
 }
