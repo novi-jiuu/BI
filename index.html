@@ -51,12 +51,22 @@ function trackEvent(eventName, desa, object) {
   };
 
   fetch(API_URL, {
-    method: "POST",
-    body: JSON.stringify(data)
-  })
+  method: "POST",
+  headers: {
+    "Content-Type": "application/json"
+  },
+  body: JSON.stringify(data)
+})
   .then(res => res.json())
   .then(res => console.log("Tracking sukses:", res))
   .catch(err => console.error("Tracking error:", err));
+}
+   function goToPage(eventName, desa, object, url) {
+  trackEvent(eventName, desa, object);
+
+  setTimeout(() => {
+    window.location.href = url;
+  }, 500); // 0.5 detik
 }
 </script>
   <style>
@@ -143,10 +153,15 @@ function trackEvent(eventName, desa, object) {
     <div class="desa">
       <h2>🏡 Desa Sebujit</h2>
       <div class="btn-group">
-        <button class="marker" onclick="trackEvent('klik_marker_rumah','sebujit','rumah'); location.href='marker.html?desa=sebujit&type=rumah'">📷 Marker - Rumah</button>
-        <button class="marker" onclick="trackEvent('klik_marker_ritual','sebujit','nyobeng'); location.href='marker.html?desa=sebujit&type=ritual'">📷 Marker - Nyobeng</button>
-        <button class="markerless" onclick="trackEvent('klik_markerless_rumah','sebujit','rumah'); location.href='markerless.html?desa=sebujit&type=rumah'">🌍 Markerless - Rumah</button>
-        <button class="markerless" onclick="trackEvent('klik_markerless_ritual','sebujit','nyobeng'); location.href='markerless.html?desa=sebujit&type=ritual'">🌍 Markerless - Nyobeng</button>
+        <button class="marker"
+        onclick="goToPage('klik_marker_rumah','sebujit','rumah','marker.html?desa=sebujit&type=rumah')">📷 Marker - Rumah</button>
+        <button class="marker"
+        onclick="goToPage('klik_marker_ritual','sebujit','nyobeng','marker.html?desa=sebujit&type=ritual')">📷 Marker - Nyobeng</button>
+        <button class="marker"
+        onclick="goToPage('klik_markerless_rumah','sebujit','rumah','markerless.html?desa=sebujit&type=rumah')">🌍 Markerless - Rumah</button>
+        <button class="marker"
+        onclick="goToPage('klik_markerless_rumah','sebujit','nyobeng','markerless.html?desa=sebujit&type=ritual')">🌍 Markerless - Nyobeng</button>
+        
       </div>
     </div>
 
@@ -154,10 +169,15 @@ function trackEvent(eventName, desa, object) {
     <div class="desa">
       <h2>🏡 Desa Jagoi Babang</h2>
       <div class="btn-group">
-        <button class="marker" onclick="trackEvent('klik_marker_rumah','jagoi','rumah'); location.href='marker.html?desa=jagoi&type=rumah'">📷 Marker - Rumah</button>
-        <button class="marker" onclick="trackEvent('klik_marker_ritual','jagoi','gawia_sowa'); location.href='marker.html?desa=jagoi&type=ritual'">📷 Marker - Gawia Sowa</button>
-        <button class="markerless" onclick="trackEvent('klik_markerless_rumah','jagoi','rumah'); location.href='markerless.html?desa=jagoi&type=rumah'">🌍 Markerless - Rumah</button>
-        <button class="markerless" onclick="trackEvent('klik_markerless_ritual','jagoi','gawia_sowa'); location.href='markerless.html?desa=jagoi&type=ritual'">🌍 Markerless - Gawia Sowa</button>
+        <button class="marker"
+        onclick="goToPage('klik_marker_rumah','jagoi','rumah','marker.html?desa=jagoi&type=rumah')">📷 Marker - Rumah</button>
+        <button class="marker"
+        onclick="goToPage('klik_marker_ritual','jagoi','gawia_sowa','marker.html?desa=jagoi&type=ritual')">📷 Marker - Nyobeng</button>
+        <button class="marker"
+        onclick="goToPage('klik_markerless_rumah','jagoi','rumah','markerless.html?desa=jagoi&type=rumah')">🌍 Markerless - Rumah</button>
+        <button class="marker"
+        onclick="goToPage('klik_markerless_rumah','jagoi','gawia_sowa','markerless.html?desa=jagoi&type=ritual')">🌍 Markerless - Nyobeng</button>
+        
       </div>
     </div>
   </main>
