@@ -188,7 +188,11 @@ marker.addEventListener("markerFound", () => {
 }
 	function keluarHalaman() {
 		let endTime = new Date().getTime();
-		let duration = Math.floor((endTime - startTime) / 1000);
+		let duration = 0;
+
+	if (startTime) {
+  		duration = Math.floor((endTime - startTime) / 1000);
+}
 
 		trackEvent("keluar_marker", desa, type, duration)
   .finally(() => {
@@ -200,7 +204,11 @@ window.addEventListener("beforeunload", () => {
   sudahKeluar = true;
 
   let endTime = new Date().getTime();
-  let duration = Math.floor((endTime - startTime) / 1000);
+  let duration = 0;
+
+  if (startTime) {
+    duration = Math.floor((endTime - startTime) / 1000);
+}
 
   navigator.sendBeacon(API_URL, JSON.stringify({
   timestamp: new Date().toISOString(),
