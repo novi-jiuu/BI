@@ -57,16 +57,13 @@ function trackEvent(eventName, desa, object) {
   },
   body: JSON.stringify(data)
 })
-  .then(res => res.json())
-  .then(res => console.log("Tracking sukses:", res))
-  .catch(err => console.error("Tracking error:", err));
+.catch(err => console.error("Tracking error:", err));
 }
    function goToPage(eventName, desa, object, url) {
-  trackEvent(eventName, desa, object);
-
-  setTimeout(() => {
-    window.location.href = url;
-  }, 500); // 0.5 detik
+  trackEvent(eventName, desa, object)
+    .finally(() => {
+      window.location.href = url;
+    });
 }
 </script>
   <style>
