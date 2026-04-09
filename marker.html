@@ -116,6 +116,8 @@ function trackEvent(eventName, desa, object, duration = 0) {
 
 	let startTime = null;
 	let isMarkerVisible = false;
+	let lostStartTime = null;
+	let totalDurasi = 0; 
     const config = {
       sebujit: {
         rumah: { model: "#rumah-sebujit", patt: "assets/marker_rumah_sebujit.patt", audio: "narasi-sebujit-rumah", scale: "0.4 0.4 0.4" },
@@ -137,78 +139,78 @@ function trackEvent(eventName, desa, object, duration = 0) {
       marker.appendChild(entity);
 
       const narasi = document.getElementById(cfg.audio);
-let lostTimeout = null;
 
 marker.addEventListener("markerFound", () => {
   if (isMarkerVisible) return;
 
-  if (lostTimeout) {
-    clearTimeout(lostTimeout);
-    lostTimeout = null;
-  }
-
   isMarkerVisible = true;
-  startTime = new Date().getTime();
-
-  const device = getDeviceInfo();
 
   navigator.sendBeacon(API_URL, JSON.stringify({
     timestamp: new Date().toISOString(),
     event: "marker_terdeteksi",
     desa: desa,
     object: type,
-    device: device.deviceType,
-    os: device.os,
+    device: getDeviceInfo().deviceType,
+    os: getDeviceInfo().os,
     duration: 0
   }));
 
-  musikDayak.play();
-  narasi.play();
-});
 
-marker.addEventListener("markerLost", () => {
-  lostTimeout = setTimeout(() => {
-    if (!isMarkerVisible || !startTime) return;
-
-    let endTime = new Date().getTime();
-    let duration = Math.floor((endTime - startTime) / 1000);
-	totalDurasi += duration;
-    const device = getDeviceInfo();
+  if (lostStartTime) {
+    let now = new Date().getTime();
+    let duration = Math.floor((now - lostStartTime) / 1000);
 
     navigator.sendBeacon(API_URL, JSON.stringify({
       timestamp: new Date().toISOString(),
       event: "marker_hilang",
       desa: desa,
       object: type,
-      device: device.deviceType,
-      os: device.os,
+      device: getDeviceInfo().deviceType,
+      os: getDeviceInfo().os,
       duration: duration
     }));
+  }
 
-    isMarkerVisible = false;
-    startTime = null;
+  lostStartTime = null;
 
-    musikDayak.pause();
-    musikDayak.currentTime = 0;
-    narasi.pause();
-    narasi.currentTime = 0;
+  startTime = new Date().getTime();
 
-  }, 500);
+  musikDayak.play();
+  narasi.play();
+});
+marker.addEventListener("markerLost", () => {
+  if (!isMarkerVisible || !startTime) return;
+
+  let now = new Date().getTime();
+
+  let durasiSesi = Math.floor((now - startTime) / 1000);
+  totalDurasi += durasiSesi;
+
+  lostStartTime = now;
+
+  isMarkerVisible = false;
+  startTime = null;
+
+  musikDayak.pause();
+  musikDayak.currentTime = 0;
+  narasi.pause();
+  narasi.currentTime = 0;
 });
 }
 	function keluarHalaman() {
-		let endTime = new Date().getTime();
-		sudahKeluar = true;
-		let duration = totalDurasi;
+  let endTime = new Date().getTime();
+  sudahKeluar = true;
 
-if (startTime) {
-  duration += Math.floor((endTime - startTime) / 1000);
-}
+  let duration = totalDurasi;
 
-		trackEvent("keluar_marker", desa, type, duration)
-  .finally(() => {
-    window.location.href = "index.html";
-  });
+  if (startTime) {
+    duration += Math.floor((endTime - startTime) / 1000);
+  }
+
+  trackEvent("keluar_marker", desa, type, duration)
+    .finally(() => {
+      window.location.href = "index.html";
+    });
 }
 window.addEventListener("beforeunload", () => {
   if (sudahKeluar) return;
@@ -216,7 +218,7 @@ window.addEventListener("beforeunload", () => {
 
   let endTime = new Date().getTime();
 
-  let duration = totalDurasi; 
+  let duration = totalDurasi;
 
   if (startTime) {
     duration += Math.floor((endTime - startTime) / 1000);
@@ -232,12 +234,6 @@ window.addEventListener("beforeunload", () => {
     duration: duration
   }));
 });
-	});
   </script>
 </body>
 </html>
-
-
-
-
-
