@@ -39,7 +39,7 @@ function getDeviceInfo() {
     userAgent: ua
   };
 }
-// fungsi kirim data
+
 function trackEvent(eventName, desa, object, duration = 0) {
   const device = getDeviceInfo();
 
@@ -50,7 +50,7 @@ function trackEvent(eventName, desa, object, duration = 0) {
     object: object,
     device: device.deviceType,
     os: device.os,
-    duration: duration
+    duration: duration.toString()
   };
 
   return fetch(API_URL, {
@@ -116,9 +116,6 @@ function trackEvent(eventName, desa, object, duration = 0) {
     ritual: "gawia"
   }
 };
-
-const objectName = objectMapping[desa]?.[type] || type;
-	
 	if (desa && type) {
   trackEvent("masuk_marker", desa, objectName);
 }
@@ -129,8 +126,6 @@ const objectName = objectMapping[desa]?.[type] || type;
 	let startTime = null;
 	let isMarkerVisible = false;
 	let lastSeenTime = null;
-	let checkInterval = null;
-	const LOST_THRESHOLD = 1000; 
     const config = {
       sebujit: {
         rumah: { model: "#rumah-sebujit", patt: "assets/marker_rumah_sebujit.patt", audio: "narasi-sebujit-rumah", scale: "0.4 0.4 0.4" },
@@ -154,64 +149,52 @@ const objectName = objectMapping[desa]?.[type] || type;
       const narasi = document.getElementById(cfg.audio);
 
 marker.addEventListener("markerFound", () => {
-
-  lastSeenTime = new Date().getTime();
-
   if (!isMarkerVisible) {
     isMarkerVisible = true;
     startTime = new Date().getTime();
-
-    const device = getDeviceInfo();
-
-    navigator.sendBeacon(API_URL, JSON.stringify({
-      timestamp: new Date().toISOString(),
-      event: "marker_terdeteksi",
-      desa: desa,
-      object: objectName,
-      device: device.deviceType,
-      os: device.os,
-      duration: "0"
-    }));
-
-    musikDayak.play();
-    narasi.play();
   }
 
-  if (!checkInterval) {
-    checkInterval = setInterval(() => {
-      if (isMarkerVisible && lastSeenTime) {
-        let now = new Date().getTime();
+  lastSeenTime = new Date().getTime();
 
-        if (now - lastSeenTime > LOST_THRESHOLD) {
-          let duration = Math.max(1, Math.floor((lastSeenTime - startTime) / 1000));
+  const device = getDeviceInfo();
 
-          const device = getDeviceInfo();
+  navigator.sendBeacon(API_URL, JSON.stringify({
+    timestamp: new Date().toISOString(),
+    event: "marker_terdeteksi",
+    desa: desa,
+    object: objectName,
+    device: device.deviceType,
+    os: device.os,
+    duration: 0
+  }));
 
-          navigator.sendBeacon(API_URL, JSON.stringify({
-            timestamp: new Date().toISOString(),
-            event: "marker_hilang",
-            desa: desa,
-            object: objectName,
-            device: device.deviceType,
-            os: device.os,
-            duration: duration.toString()
-          }));
+  musikDayak.play();
+  narasi.play();
+});
+	  marker.addEventListener("markerLost", () => {
+  if (!isMarkerVisible || !startTime) return;
 
-          isMarkerVisible = false;
-          startTime = null;
-          lastSeenTime = null;
+  let duration = Math.floor((lastSeenTime - startTime) / 1000);
 
-          musikDayak.pause();
-          musikDayak.currentTime = 0;
-          narasi.pause();
-          narasi.currentTime = 0;
+  const device = getDeviceInfo();
 
-          clearInterval(checkInterval);
-          checkInterval = null;
-        }
-      }
-    }, 200);
-  }
+  navigator.sendBeacon(API_URL, JSON.stringify({
+    timestamp: new Date().toISOString(),
+    event: "marker_hilang",
+    desa: desa,
+    object: objectName,
+    device: device.deviceType,
+    os: device.os,
+    duration: duration.toString()
+  }));
+
+  isMarkerVisible = false;
+  startTime = null;
+
+  musikDayak.pause();
+  musikDayak.currentTime = 0;
+  narasi.pause();
+  narasi.currentTime = 0;
 });
 }
 	function keluarHalaman() {
@@ -219,10 +202,10 @@ marker.addEventListener("markerFound", () => {
 		let duration = 0;
 
 	if (startTime) {
-  		duration = Math.max(1, Math.floor((endTime - startTime) / 1000));
+  		duration = Math.floor((endTime - startTime) / 1000);
 }
 
-		trackEvent("keluar_marker", desa, objectName, duration.toString())
+		trackEvent("keluar_marker", desa, objectName, duration)
   .finally(() => {
     window.location.href = "index.html";
   });
@@ -235,17 +218,16 @@ window.addEventListener("beforeunload", () => {
   let duration = 0;
 
   if (startTime) {
-    duration = Math.max(1, Math.floor((endTime - startTime) / 1000));
+    duration = Math.floor((endTime - startTime) / 1000);
 }
-	const device = getDeviceInfo();
 
-navigator.sendBeacon(API_URL, JSON.stringify({
+  navigator.sendBeacon(API_URL, JSON.stringify({
   timestamp: new Date().toISOString(),
   event: "keluar_marker",
   desa: desa,
   object: objectName,
-  device: device.deviceType,
-  os: device.os,
+  device: getDeviceInfo().deviceType,
+  os: getDeviceInfo().os,
   duration: duration.toString()
 }));
 	});
