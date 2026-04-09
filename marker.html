@@ -116,6 +116,7 @@ function trackEvent(eventName, desa, object, duration = 0) {
     ritual: "gawia"
   }
 };
+const objectName = objectMapping[desa]?.[type] || type;
 	if (desa && type) {
   trackEvent("masuk_marker", desa, objectName);
 }
@@ -205,7 +206,7 @@ marker.addEventListener("markerFound", () => {
   		duration = Math.floor((endTime - startTime) / 1000);
 }
 
-		trackEvent("keluar_marker", desa, objectName, duration)
+		trackEvent("keluar_marker", desa, objectName, duration.toString())
   .finally(() => {
     window.location.href = "index.html";
   });
