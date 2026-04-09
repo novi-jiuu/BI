@@ -152,27 +152,28 @@ const objectName = objectMapping[desa]?.[type] || type;
       const narasi = document.getElementById(cfg.audio);
 
 marker.addEventListener("markerFound", () => {
+
   if (!isMarkerVisible) {
-  isMarkerVisible = true;
-  startTime = new Date().getTime();
-}
+    isMarkerVisible = true;
+    startTime = new Date().getTime();
 
-lastSeenTime = new Date().getTime();
+    const device = getDeviceInfo();
 
-  const device = getDeviceInfo();
+    navigator.sendBeacon(API_URL, JSON.stringify({
+      timestamp: new Date().toISOString(),
+      event: "marker_terdeteksi",
+      desa: desa,
+      object: objectName,
+      device: device.deviceType,
+      os: device.os,
+      duration: 0
+    }));
 
-  navigator.sendBeacon(API_URL, JSON.stringify({
-    timestamp: new Date().toISOString(),
-    event: "marker_terdeteksi",
-    desa: desa,
-    object: objectName,
-    device: device.deviceType,
-    os: device.os,
-    duration: 0
-  }));
+    musikDayak.play();
+    narasi.play();
+  }
 
-  musikDayak.play();
-  narasi.play();
+  lastSeenTime = new Date().getTime();
 });
 	  marker.addEventListener("markerLost", () => {
   if (!isMarkerVisible || !startTime) return;
