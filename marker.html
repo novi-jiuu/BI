@@ -129,6 +129,9 @@ const objectName = objectMapping[desa]?.[type] || type;
 	let isMarkerVisible = false;
 	let lastSeenTime = null;
 	let totalDuration = 0;
+	let lastLostTime = 0;
+	const LOST_DELAY = 1000; 
+	  
     const config = {
       sebujit: {
         rumah: { model: "#rumah-sebujit", patt: "assets/marker_rumah_sebujit.patt", audio: "narasi-sebujit-rumah", scale: "0.4 0.4 0.4" },
@@ -153,6 +156,8 @@ const objectName = objectMapping[desa]?.[type] || type;
 
 marker.addEventListener("markerFound", () => {
 
+  lastSeenTime = new Date().getTime();
+
   if (!isMarkerVisible) {
     isMarkerVisible = true;
     startTime = new Date().getTime();
@@ -173,8 +178,12 @@ marker.addEventListener("markerFound", () => {
     narasi.play();
   }
 
-  lastSeenTime = new Date().getTime();
 });
+	  
+	  let now = new Date().getTime();
+if (now - lastLostTime < LOST_DELAY) return;
+lastLostTime = now;
+	  
 	  marker.addEventListener("markerLost", () => {
   if (!isMarkerVisible || !startTime) return;
   if (!lastSeenTime) return;
