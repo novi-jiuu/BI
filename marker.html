@@ -139,31 +139,34 @@ function trackEvent(eventName, desa, object, duration = 0) {
       const narasi = document.getElementById(cfg.audio);
 
 marker.addEventListener("markerFound", () => {
-  if (isMarkerVisible) return;
+  if (!isMarkerVisible) {
+    isMarkerVisible = true;
+    lastSeenTime = new Date().getTime();
 
-  isMarkerVisible = true;
-  startTime = new Date().getTime();
-
-  const device = getDeviceInfo();
-
-  navigator.sendBeacon(API_URL, JSON.stringify({
-    timestamp: new Date().toISOString(),
-    event: "marker_terdeteksi",
-    desa: desa,
-    object: type,
-    device: device.deviceType,
-    os: device.os,
-    duration: 0
-  }));
+    navigator.sendBeacon(API_URL, JSON.stringify({
+      timestamp: new Date().toISOString(),
+      event: "marker_terdeteksi",
+      desa: desa,
+      object: type,
+      device: getDeviceInfo().deviceType,
+      os: getDeviceInfo().os,
+      duration: 0
+    }));
+  }
+});
 
   musikDayak.play();
   narasi.play();
 });
 	  marker.addEventListener("markerLost", () => {
-  if (!isMarkerVisible || !startTime) return;
+  if (isMarkerVisible && lastSeenTime) {
+    let now = new Date().getTime();
+    totalDuration += Math.floor((now - lastSeenTime) / 1000);
+  }
 
-  let endTime = new Date().getTime();
-  let duration = Math.floor((endTime - startTime) / 1000);
+  isMarkerVisible = false;
+  lastSeenTime = null;
+});
 
   const device = getDeviceInfo();
 
@@ -187,39 +190,35 @@ marker.addEventListener("markerFound", () => {
 });
 }
 	function keluarHalaman() {
-		let endTime = new Date().getTime();
-		let duration = 0;
+  if (isMarkerVisible && lastSeenTime) {
+    let now = new Date().getTime();
+    totalDuration += Math.floor((now - lastSeenTime) / 1000);
+  }
 
-	if (startTime) {
-  		duration = Math.floor((endTime - startTime) / 1000);
-}
-
-		trackEvent("keluar_marker", desa, type, duration)
-  .finally(() => {
-    window.location.href = "index.html";
-  });
+  trackEvent("keluar_marker", desa, type, totalDuration)
+    .finally(() => {
+      window.location.href = "index.html";
+    });
 }
 window.addEventListener("beforeunload", () => {
   if (sudahKeluar) return;
   sudahKeluar = true;
 
-  let endTime = new Date().getTime();
-  let duration = 0;
-
-  if (startTime) {
-    duration = Math.floor((endTime - startTime) / 1000);
-}
+  if (isMarkerVisible && lastSeenTime) {
+    let now = new Date().getTime();
+    totalDuration += Math.floor((now - lastSeenTime) / 1000);
+  }
 
   navigator.sendBeacon(API_URL, JSON.stringify({
-  timestamp: new Date().toISOString(),
-  event: "keluar_marker",
-  desa: desa,
-  object: type,
-  device: getDeviceInfo().deviceType,
-  os: getDeviceInfo().os,
-  duration: duration
-}));
-	});
+    timestamp: new Date().toISOString(),
+    event: "keluar_marker",
+    desa: desa,
+    object: type,
+    device: getDeviceInfo().deviceType,
+    os: getDeviceInfo().os,
+    duration: totalDuration
+  }));
+});
   </script>
 </body>
 </html>
