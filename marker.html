@@ -107,8 +107,16 @@ function trackEvent(eventName, desa, object, duration = 0) {
     const desa = params.get("desa");
     const type = params.get("type");
 	
+	function getObjectName(desa, type) {
+  if (desa === "sebujit" && type === "rumah") return "rumah_sebujit";
+  if (desa === "sebujit" && type === "ritual") return "ritual_nyobeng";
+  if (desa === "jagoi" && type === "rumah") return "rumah_jagoi";
+  if (desa === "jagoi" && type === "ritual") return "ritual_gawia_sowa";
+  return type;
+}
+	
 	if (desa && type) {
-  trackEvent("masuk_marker", desa, type);
+  trackEvent("masuk_marker", desa, getObjectName(desa, type));
 }
 	
     const musikDayak = document.getElementById("musik-dayak");
@@ -150,7 +158,7 @@ marker.addEventListener("markerFound", () => {
     timestamp: new Date().toISOString(),
     event: "marker_terdeteksi",
     desa: desa,
-    object: type,
+    object: getObjectName(desa, type),
     device: device.deviceType,
     os: device.os,
     duration: 0
@@ -171,7 +179,7 @@ marker.addEventListener("markerFound", () => {
     timestamp: new Date().toISOString(),
     event: "marker_hilang",
     desa: desa,
-    object: type,
+    object: getObjectName(desa, type),
     device: device.deviceType,
     os: device.os,
     duration: duration
@@ -194,7 +202,7 @@ marker.addEventListener("markerFound", () => {
   		duration = Math.floor((endTime - startTime) / 1000);
 }
 
-		trackEvent("keluar_marker", desa, type, duration)
+		trackEvent("keluar_marker", desa, getObjectName(desa, type), duration)
   .finally(() => {
     window.location.href = "index.html";
   });
@@ -214,7 +222,7 @@ window.addEventListener("beforeunload", () => {
   timestamp: new Date().toISOString(),
   event: "keluar_marker",
   desa: desa,
-  object: type,
+  object: getObjectName(desa, type),
   device: getDeviceInfo().deviceType,
   os: getDeviceInfo().os,
   duration: duration
